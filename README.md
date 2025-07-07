@@ -1,18 +1,30 @@
-# Mini WebAPI to retrieve air pressure data from KNMI data
+# Mini WebAPI to retrieve the current air pressure at a given location in NL
 
 ## Usage
 
 ### Installation
-1. run `pip install -r requirements.txt` in a fresh python environment
-2. clone current package from GitHub
+
+0. Create and activate a fresh python environment, e.g. using [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-with-commands).
+1. Clone the current package from GitHub.
+2. Install requirements by running:
+
+```bash
+pip install -r requirements.txt
+```
 
 ### Running the WebAPI
-1. run `uvicorn src.pressure_api:app --reload`
-2. visit http://127.0.0.1:8000/
-3. Input a city in The Netherlands to retrieve the air pressure data at sea level for the closest weather station
-    - Note that the app currently retrieves data for one week ago from today
 
+0. Request an EDR API key [from KNMI](https://developer.dataplatform.knmi.nl/apis).
+1. Rename the `.env.template` file in this repo to `.env` and add your API key.
+   - By renaming the file, it will not be tracked.
+2. Start the API by running from the repository home folder.
 
+```bash
+uvicorn src.pressure_api:app --reload
+```
+
+3. Visit http://127.0.0.1:8000/
+4. Input a city in The Netherlands to retrieve the air pressure data at sea level for the closest weather station.
 
 ## Assignment
 

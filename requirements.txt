@@ -2,3 +2,5 @@ geopy
 requests
 fastapi
 pandas
+uvicorn
+dotenv

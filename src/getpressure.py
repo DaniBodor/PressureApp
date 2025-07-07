@@ -1,17 +1,20 @@
 import datetime
+import os
 
 import pandas as pd
 import requests
+from dotenv import load_dotenv
 from geopy.distance import geodesic
 from geopy.geocoders import Nominatim
-from knmi.metadata import Station
 
+load_dotenv() # Load environment variables from .env file
+
+TOKEN = os.getenv("KNMI_API_KEY")
 API_VERSION = "v1"
 COLLECTION = "10-minute-in-situ-meteorological-observations"
 BASE_URL = f"https://api.dataplatform.knmi.nl/edr/{API_VERSION}/collections/{COLLECTION}"
-TOKEN = "eyJvcmciOiI1ZTU1NGUxOTI3NGE5NjAwMDEyYTNlYjEiLCJpZCI6IjdiYjVkMjVlMjhmMDQ0ZmQ5ZGZiYmFiMDI5YmIzMGU3IiwiaCI6Im11cm11cjEyOCJ9"  # noqa: S105 E501
 HEADERS = {"Authorization": TOKEN}
-TIMEOUT = 20  # seconds for requests timeout
+TIMEOUT = 20  # seconds for before `requests` times out
 
 
 def get_pressure(station_id: str) -> tuple[float, str]:
@@ -20,10 +23,12 @@ def get_pressure(station_id: str) -> tuple[float, str]:
     Also return the time of the data retrieval as stated in the dataset.
     """
     # Round down to the last 10-minute timepoint
-    current_time = datetime.datetime.now(datetime.UTC)
+    utc = datetime.timezone.utc
+    current_time = datetime.datetime.now(utc)
 
     # HACK: Due to a delay in saving the data, we are picking up the last measurement from 10 minutes ago.
     # A more elegant solution would be to do a while loop or try/except until it succeeds.
+    # TODO: fix this, it can lead to a negative time!
     last_measurement = current_time.replace(minute=((current_time.minute // 10) - 1) * 10, second=0)
     last_measurement = last_measurement.strftime("%Y-%m-%dT%H:%M:%SZ")
     params = {
@@ -39,7 +44,7 @@ def get_pressure(station_id: str) -> tuple[float, str]:
     return df["ranges.pp.values"].iloc[0][0], last_measurement
 
 
-def get_location(input_city: str) -> tuple[Station, float]:
+def get_location(input_city: str) -> tuple[str, float]:
     """Get the nearest KNMI weather station to the given city and the distance to it in km."""
     city_coords = _get_input_coordinates(input_city)
 
