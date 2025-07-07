@@ -3,7 +3,7 @@ import traceback
 from fastapi import FastAPI, Query
 from fastapi.responses import HTMLResponse
 
-from .getpressure import get_location, get_pressure
+from src.getdata import get_location, get_pressure
 
 app = FastAPI()
 
@@ -36,8 +36,8 @@ def pressure_endpoint(city_name: str = Query(..., description="City in The Nethe
             "distance (km) to nearest weather station": round(min_distance, 1),
             "pressure (hPa) at sea level": float(pressure),
         }
-    except ValueError as ve:
-        return {"No data retrieved": str(ve)}
+    except ValueError as e:
+        return {"No data retrieved": str(e)}
     except Exception as e:  # noqa: BLE001
         # Log the traceback for debugging purposes
         tb_str = traceback.format_exc()

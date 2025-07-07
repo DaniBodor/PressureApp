@@ -1,4 +1,4 @@
-from getpressure import get_location, get_pressure
+from src.getdata import get_location, get_pressure
 
 if __name__ == "__main__":
     # Test the script with a user input
