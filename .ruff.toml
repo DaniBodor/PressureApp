@@ -20,6 +20,7 @@ ignore = [
     "COM812", # Recommended to ignore by Ruff itself
     "UP038",  # Use X | Y instead of (X, Y) in isinstance()
     "B905",   # zip-without-explicit-strict
+    "UP017",  # datetime.UTC (updated in newer python versions, but doesn't work in older versions)
     # Unneeded docstrings
     "D100",   # Missing module docstring
     "D104",   # Missing public package docstring

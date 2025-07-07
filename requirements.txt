@@ -2,3 +2,4 @@ geopy
 requests
 fastapi
 pandas
+uvicorn
