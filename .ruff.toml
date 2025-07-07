@@ -1,0 +1,51 @@
+target-version = "py311"
+line-length = 120
+output-format = "concise"
+exclude = ["sandbox/*"]
+
+[lint]
+pydocstyle.convention = "google"
+select = ["ALL"]
+ignore = [
+    # Unwanted
+    "FAST002", # FastAPI specific
+    "DTZ005", # datetime timezone aware
+    "FBT",    # Boolean function arguments
+    "ANN003", # Missing type annotation for **{name} (e.g. **kwargs)
+    "ANN204", # Missing return type annotation for special (dunder) method
+    "PT011",  # pytest.raises without error messages
+    "TD",     # TODO formatting
+    "FIX",    # Resolve FIXME, TODO, XXX
+    "EXE002", # Executable but no shebang
+    "COM812", # Recommended to ignore by Ruff itself
+    "UP038",  # Use X | Y instead of (X, Y) in isinstance()
+    # Unneeded docstrings
+    "D100",   # Missing module docstring
+    "D104",   # Missing public package docstring
+    "D105",   # Missing docstring in magic method
+    "D107",   # Missing docstring in `__init__`
+    "CPY001", # Missing copyright notice
+]
+
+# Autofix settings
+fixable = ["ALL"]
+unfixable = [
+    "F401",   # unused imports (should not disappear while editing)
+    "ERA001", # commented out code
+    "B905",   # zip-without-explicit-strict
+    "T201",   # print-statements
+    "RUF100", # remove unused noqa (preferable to control when this happens?)
+]
+extend-safe-fixes = [
+    "D415",   # First line should end with a period, question mark, or exclamation point
+    "D300",   # Use triple double quotes `"""`
+    "D200",   # One-line docstring should fit on one line
+    "TC",     # Format type checking only imports
+    "ISC001", # Implicitly concatenated strings on a single line
+    "EM",     # Exception message variables
+    "RUF013", # Implicit Optional
+    "B006",   # Mutable default argument
+]
+
+[lint.per-file-ignores]
+"src/run_local.py" = ["T201"] # prints
