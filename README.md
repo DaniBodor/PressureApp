@@ -7,7 +7,7 @@
 2. clone current package from GitHub
 
 ### Running the WebAPI
-1. run `uvicorn src.weather_api:app --reload`
+1. run `uvicorn src.pressure_api:app --reload`
 2. visit http://127.0.0.1:8000/
 3. Input a city in The Netherlands to retrieve the air pressure data at sea level for the closest weather station
     - Note that the app currently retrieves data for one week ago from today
@@ -16,4 +16,4 @@
 
 ## Assignment
 
-Make a Web API in the programming language of your choice. The API should have a single endpoint that you can give the name of a town in The Netherlands as input, and it will return the current air pressure (at sea level) of the closest KNMI Automatic Weather Station, and the distance to that Automatic Weather Station as output. Use the 10-minute-in-situ-meteorological-observations collection of the KDP EDR API (https://developer.dataplatform.knmi.nl/edr-api) and any other publicly available API’s you want. During the interview, we would like to discuss the code, and the choices you've made. Could you upload your solution to the following URLhttps://surfdrive.surf.nl/files/index.php/s/IJq1xfMqbz83LRF, at least one day ahead of the interview:Other means to share the code are also fine.
+Make a Web API in the programming language of your choice. The API should have a single endpoint that you can give the name of a town in The Netherlands as input, and it will return the current air pressure (at sea level) of the closest KNMI Automatic Weather Station, and the distance to that Automatic Weather Station as output. Use the 10-minute-in-situ-meteorological-observations collection of the [KDP EDR API](https://developer.dataplatform.knmi.nl/edr-api) and any other publicly available API’s you want. During the interview, we would like to discuss the code, and the choices you've made.
