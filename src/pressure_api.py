@@ -1,4 +1,3 @@
-import datetime
 import traceback
 
 from fastapi import FastAPI, Query
@@ -28,19 +27,13 @@ def index() -> str:
 @app.get("/pressure")
 def pressure_endpoint(city_name: str = Query(..., description="City in The Netherlands")) -> dict:
     """Return the air pressure at sea level for the nearest KNMI weather station to the given city."""
-    now = datetime.datetime.now()
-    lastweek = now - datetime.timedelta(days=7)
-
-    data_time = lastweek
     try:
         nearest_station, min_distance = get_location(city_name)
-        pressure, retrieve_time = get_pressure(nearest_station, data_time)
+        pressure, retrieve_time = get_pressure(nearest_station)
         return {
-            "city": city_name,
-            # "nearest_station": nearest_station.name,
-            # "station_number": nearest_station.number,
+            "target city": city_name,
+            "data retrieved for timepoint (UTC)": retrieve_time,
             "distance (km) to nearest weather station": round(min_distance, 1),
-            "data retrieved for timepoint": retrieve_time,
             "pressure (hPa) at sea level": float(pressure),
         }
     except ValueError as ve:

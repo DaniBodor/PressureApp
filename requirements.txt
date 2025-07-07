@@ -1,6 +1,4 @@
 geopy
-knmi-py
 requests
-edr-pydantic
 fastapi
 pandas
