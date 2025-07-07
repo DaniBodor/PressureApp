@@ -1,6 +1,6 @@
 import datetime
 
-from .getpressure import get_location, get_pressure
+from getpressure import get_location, get_pressure
 
 if __name__ == "__main__":
     # Test the script with a user input
@@ -16,6 +16,6 @@ if __name__ == "__main__":
         print(f"Distance: {min_distance:.2f} km")
 
         pressure = get_pressure(nearest_station, retrieve_time)
-        print(f"Air pressure on {retrieve_time.strftime('%Y-%m-%d %H:00')}: {pressure} hPa")
+        print(f"Air pressure at {pressure[1]}: {pressure[0]} hPa")
     except ValueError as e:
         print(e)

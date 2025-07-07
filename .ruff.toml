@@ -48,4 +48,4 @@ extend-safe-fixes = [
 ]
 
 [lint.per-file-ignores]
-"src/run_local.py" = ["T201"] # prints
+"src/test_local.py" = ["T201"] # prints
