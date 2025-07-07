@@ -42,13 +42,16 @@ def _get_nearest_station(city_coords: tuple[float, float]) -> tuple[Station, flo
 
     return nearest_station, min_distance
 
-
 def get_pressure(station: Station, time: datetime.datetime) -> tuple[float, str]:
     """Get the air pressure at sea level for the given station and time.
 
     Also return the time of the data retrieval as stated in the dataset.
     """
     # TODO: Use the 10-minute data instead of hourly data.
+    return _get_hourly_pressure(station, time)
+
+def _get_hourly_pressure(station: Station, time: datetime.datetime) -> tuple[float, str]:
+    """Get the air pressure at sea level for the given station and time using hourly data."""
     # The hourly data is not updated in real time, so at best can pick up from few days ago.
     retrieve_time = time.strftime("%Y%m%d%H")  # format as YYYYMMDDHH
     pressure_df = knmi.get_hour_data_dataframe(
@@ -62,3 +65,6 @@ def get_pressure(station: Station, time: datetime.datetime) -> tuple[float, str]
     except IndexError as e:
         msg = f"No data available for station {station.name} at {time}."
         raise ValueError(msg) from e
+
+def _get_nearrealtime_pressure(station: Station, time: datetime.datetime) -> tuple[float, str]:
+    ...
