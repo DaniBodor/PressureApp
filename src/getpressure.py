@@ -13,7 +13,7 @@ BASE_URL = f"https://api.dataplatform.knmi.nl/edr/{API_VERSION}/collections/{COL
 TOKEN = "eyJvcmciOiI1ZTU1NGUxOTI3NGE5NjAwMDEyYTNlYjEiLCJpZCI6IjdiYjVkMjVlMjhmMDQ0ZmQ5ZGZiYmFiMDI5YmIzMGU3IiwiaCI6Im11cm11cjEyOCJ9"  # noqa: S105 E501
 HEADERS = {"Authorization": TOKEN}
 TIMEOUT = 20  # seconds for requests timeout
-REALTIME = False  # Set to False to use hourly data instead of near real-time data
+REALTIME = True  # Set to False to use hourly data instead of near real-time data
 
 def get_location(input_city: str) -> tuple[Station, float]:
     """Get the nearest KNMI weather station to the given city and the distance to it in km."""

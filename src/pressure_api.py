@@ -37,11 +37,11 @@ def pressure_endpoint(city_name: str = Query(..., description="City in The Nethe
         pressure, retrieve_time = get_pressure(nearest_station, data_time)
         return {
             "city": city_name,
-            "nearest_station": nearest_station.name,
-            "station_number": nearest_station.number,
-            f"distance (km) to {city_name}": round(min_distance, 1),
-            "data retrieved for": retrieve_time,
-            "pressure (hPa) at sea level": int(pressure),
+            # "nearest_station": nearest_station.name,
+            # "station_number": nearest_station.number,
+            "distance (km) to nearest weather station": round(min_distance, 1),
+            "data retrieved for timepoint": retrieve_time,
+            "pressure (hPa) at sea level": float(pressure),
         }
     except ValueError as ve:
         return {"No data retrieved": str(ve)}
