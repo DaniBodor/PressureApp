@@ -1,5 +1,6 @@
 import sys
 import requests
+import pandas as pd
 from datetime import datetime, timezone
 
 api_version = "v1"
@@ -28,7 +29,6 @@ def location(location_id, params):
 
 
 def main():
-
     current_time = datetime.now(timezone.utc)
     # Round down to the last 10-minute timepoint
     last_measurement = current_time.replace(minute=((current_time.minute // 10)-1) * 10, second=0)
@@ -40,7 +40,10 @@ def main():
         "parameter-name": "pp",
     }
     response = location("0-20000-0-06260", params)
-    pp_value = response['coverages'][0]['ranges']['pp']['values'][0]
+
+    # Use pandas to elegantly extract the pressure value
+    df = pd.json_normalize(response['coverages'])
+    pp_value = df['ranges.pp.values'].iloc[0][0]
     print(pp_value)
 
 

@@ -12,8 +12,7 @@ if __name__ == "__main__":
 
     try:
         nearest_station, min_distance = get_location(city_name)
-        print(f"Nearest station to {city_name} is {nearest_station.name} ({nearest_station.number})")
-        print(f"Distance: {min_distance:.2f} km")
+        print(f"Nearest station to {city_name} is at {min_distance:.2f} km distance.")
 
         pressure = get_pressure(nearest_station, retrieve_time)
         print(f"Air pressure at {pressure[1]}: {pressure[0]} hPa")
