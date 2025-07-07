@@ -39,26 +39,26 @@ def _get_nearest_station(city_coords):
 def get_pressure(station: Station, time: datetime.datetime):
     # TODO: Use the 10-minute data instead of hourly data.
     # The hourly data is not updated in real time, so at best can pick up from few days ago.
-    time = time.strftime("%Y%m%d%H")  # format as YYYYMMDDHH
+    retrieve_time = time.strftime("%Y%m%d%H")  # format as YYYYMMDDHH
     pressure_df = knmi.get_hour_data_dataframe(
         stations=[station.number],
-        start=time,
-        end=time,
-        variables=["P"],
+        start=retrieve_time,
+        end=retrieve_time,
+        variables=["P"],  # NOTE: in the real time data, the pressure at sea level variable is "pp" instead of "P".
     )
     try:
-        return pressure_df["P"].values[0]
+        return pressure_df["P"].values[0], retrieve_time
     except IndexError:
         raise ValueError(f"No data available for station {station.name} at {time}.")
 
 
 if __name__ == "__main__":
     # Test the script with a user input
-    city_name = input("Enter a city in the Netherlands: ")
+    city_name = input("City in the Netherlands: ")
     now = datetime.datetime.now()
     last_week = now - datetime.timedelta(days=7)
 
-    retrieve_time = now
+    retrieve_time = last_week
 
     try:
         nearest_station, min_distance = get_location(city_name)
