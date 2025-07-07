@@ -1,4 +1,4 @@
-from src.getdata import get_location, get_pressure
+from getdata import get_latest_pressure, get_location
 
 if __name__ == "__main__":
     # Test the script with a user input
@@ -8,7 +8,7 @@ if __name__ == "__main__":
         nearest_station, min_distance = get_location(city_name)
         print(f"Nearest station to {city_name} is at {min_distance:.2f} km distance.")
 
-        pressure = get_pressure(nearest_station)
+        pressure = get_latest_pressure(nearest_station)
         print(f"Air pressure at {pressure[1]}: {pressure[0]} hPa")
     except ValueError as e:
         print(e)

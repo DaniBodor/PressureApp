@@ -17,22 +17,19 @@ HEADERS = {"Authorization": TOKEN}
 TIMEOUT = 20  # seconds for before a request times out
 
 
-def get_pressure(station_id: str) -> tuple[float, str]:
+def get_latest_pressure(station_id: str) -> tuple[float, str]:
     """Get the air pressure at sea level for the given KNMI weather station (wigos) id.
 
     Also return the time of the data retrieval as stated in the dataset.
     """
     utc = datetime.timezone.utc
-    current_time = datetime.datetime.now(utc)
+    now = datetime.datetime.now(utc)
+    # Data is acquired in 10 minute intervals and uploaded with a delay of a few minutes.
+    # By fetching data from the last 20 minutes, we ensure we get the latest available data.
+    older = now - datetime.timedelta(minutes=20)
 
-    # Round down to the last 10-minute timepoint
-    # HACK: Due to a delay in saving the data, we are picking up the last measurement from 10 minutes ago.
-    # A more elegant solution would be to do a while loop or try/except until it succeeds.
-    # TODO: fix this, it can lead to a negative time!
-    last_measurement = current_time.replace(minute=((current_time.minute // 10) - 1) * 10, second=0)
-    last_measurement = last_measurement.strftime("%Y-%m-%dT%H:%M:%SZ")
     params = {
-        "datetime": f"{last_measurement}/{last_measurement}",
+        "datetime": f"{strf(older)}/{strf(now)}",
         "parameter-name": "pp",
     }
 
@@ -43,11 +40,15 @@ def get_pressure(station_id: str) -> tuple[float, str]:
         timeout=TIMEOUT,
     )
     response.raise_for_status()
-    response = response.json()
 
-    df = pd.json_normalize(response["coverages"])
-    pressure_value = df["ranges.pp.values"].iloc[0][0]
-    return pressure_value, last_measurement
+    # Extract relevant data from response
+    coverage = response.json()["coverages"][0]
+    times = coverage["domain"]["axes"]["t"]["values"]
+    values = coverage["ranges"]["pp"]["values"]
+    df = pd.DataFrame({"time": times, "pressure": values})
+
+    # return the last pressure value and its corresponding time
+    return df["pressure"].iloc[-1], df["time"].iloc[-1]
 
 
 def get_location(input_city: str) -> tuple[str, float]:
@@ -92,3 +93,8 @@ def _get_wigos_station_data() -> dict[str, tuple[float, float]]:
     df = pd.json_normalize(data["features"])
     # Create dict from id and coordinates columns
     return dict(zip(df["id"], df["geometry.coordinates"]))
+
+
+def strf(dt: datetime.datetime) -> str:
+    """Format a datetime object to a string into format required by API."""
+    return dt.strftime("%Y-%m-%dT%H:%M:%SZ")
