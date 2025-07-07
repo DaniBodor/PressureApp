@@ -3,7 +3,7 @@ import traceback
 from fastapi import FastAPI, Query
 from fastapi.responses import HTMLResponse
 
-from src.getdata import get_location, get_pressure
+from src.getdata import get_latest_pressure, get_location
 
 app = FastAPI()
 
@@ -29,10 +29,10 @@ def pressure_endpoint(city_name: str = Query(..., description="City in The Nethe
     """Return the air pressure at sea level for the nearest KNMI weather station to the given city."""
     try:
         nearest_station, min_distance = get_location(city_name)
-        pressure, retrieve_time = get_pressure(nearest_station)
+        pressure, retrieve_time = get_latest_pressure(nearest_station)
         return {
             "target city": city_name,
-            "data retrieved for timepoint (UTC)": retrieve_time,
+            "data retrieved for timepoint (UTC)": retrieve_time.replace("T", " ").replace(":00Z", ""),
             "distance (km) to nearest weather station": round(min_distance, 1),
             "pressure (hPa) at sea level": float(pressure),
         }
