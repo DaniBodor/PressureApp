@@ -39,6 +39,8 @@ def pressure_endpoint(city_name: str = Query(..., description="City in The Nethe
             "data retrieved for": retrieve_time,
             "pressure (hPa) at sea level": int(pressure)
         }
+    except ValueError as ve:
+        return {"No data retrieved": str(ve)}
     except Exception as e:
         import traceback
         tb_str = traceback.format_exc()
