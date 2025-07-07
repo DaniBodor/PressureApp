@@ -6,24 +6,11 @@ from knmi.metadata import Station
 
 STATIONS = knmi.stations
 
-def get_time():
-    current_time = datetime.datetime.now()
-    return current_time.strftime("%Y%m%d%H") # formatted as YYYYMMDDHH
 
 def get_location(input_city):
     coordinates = _get_input_coordinates(input_city)
     nearest_station, min_distance = _get_nearest_station(coordinates)
     return nearest_station, min_distance
-
-def get_pressure(station: Station, current_time: str):
-    pressure_df = knmi.get_hour_data_dataframe(
-        stations=station.number,
-        start=current_time,
-        end=current_time,
-        variables=["P"],
-    )
-    return pressure_df["P"]
-
 
 def _get_input_coordinates(city_name):
     geolocator = Nominatim(user_agent="knmi_city_lookup")
@@ -48,3 +35,37 @@ def _get_nearest_station(city_coords):
             nearest_station = station
 
     return nearest_station, min_distance
+
+def get_pressure(station: Station, time: datetime.datetime):
+    # TODO: Use the 10-minute data instead of hourly data.
+    # The hourly data is not updated in real time, so at best can pick up from few days ago.
+    time = time.strftime("%Y%m%d%H")  # format as YYYYMMDDHH
+    pressure_df = knmi.get_hour_data_dataframe(
+        stations=[station.number],
+        start=time,
+        end=time,
+        variables=["P"],
+    )
+    try:
+        return pressure_df["P"].values[0]
+    except IndexError:
+        raise ValueError(f"No data available for station {station.name} at {time}.")
+
+
+if __name__ == "__main__":
+    # Test the script with a user input
+    city_name = input("Enter a city in the Netherlands: ")
+    now = datetime.datetime.now()
+    last_week = now - datetime.timedelta(days=7)
+
+    retrieve_time = now
+
+    try:
+        nearest_station, min_distance = get_location(city_name)
+        print(f"Nearest station to {city_name} is {nearest_station.name} ({nearest_station.number})")
+        print(f"Distance: {min_distance:.2f} km")
+
+        pressure = get_pressure(nearest_station, retrieve_time)
+        print(f"Air pressure on {retrieve_time.strftime('%Y-%m-%d %H:00')}: {pressure} hPa")
+    except ValueError as e:
+        print(e)
