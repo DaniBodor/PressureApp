@@ -17,6 +17,8 @@ BASE_URL = f"https://api.dataplatform.knmi.nl/edr/{API_VERSION}/collections/{COL
 HEADERS = {"Authorization": TOKEN}
 TIMEOUT = 20  # seconds for before a request times out
 
+geolocator = Nominatim(user_agent="knmi_city_lookup", timeout=TIMEOUT)
+
 
 def get_latest_pressure(station_id: str) -> tuple[float, str]:
     """Get the air pressure at sea level for the given KNMI weather station (wigos) id.
@@ -67,8 +69,11 @@ def get_location(input_city: str) -> tuple[str, float]:
 
 
 def _get_input_coordinates(city_name: str) -> tuple[float, float]:
-    """Get the coordinates (lat, lon) of the given city name in the Netherlands."""
-    geolocator = Nominatim(user_agent="knmi_city_lookup")
+    """Get the coordinates (lon, lat) of the given city name in the Netherlands.
+
+    The coordinates are returned flipped from typical convention of (lat, lon) to match how the data is retrieved from
+    the collection.
+    """
     try:
         msg = f"Could not find coordinates for city: {city_name}"
         location = geolocator.geocode(city_name, featuretype="city")
