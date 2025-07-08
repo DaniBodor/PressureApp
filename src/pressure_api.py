@@ -40,7 +40,7 @@ def pressure_endpoint(city_name: str = Query(..., description="City in The Nethe
             "time of measurement (UTC)": retrieve_time,
             "sea level air pressure (hPa) at station": pressure,
         }
-    # TODO: Consider adding HTML response for errors instead of JSON.
+    # TODO: Consider adding HTTP response for errors instead of JSON.
     except ValueError as e:
         return {"No data retrieved": str(e)}
     except Exception as e:  # noqa: BLE001

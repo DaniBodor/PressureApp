@@ -30,7 +30,7 @@ def get_latest_pressure(station_id: str) -> tuple[float | None, str | None]:
     now = datetime.datetime.now(utc)
     # Data is acquired in 10 minute intervals and uploaded with a (non-constant) delay of a few minutes.
     # By fetching data from the last 20 minutes, we ensure we get the latest available data.
-    older = now - datetime.timedelta(minutes=20)
+    older = now - datetime.timedelta(hours=48)
 
     params = {
         "datetime": f"{strf(older)}/{strf(now)}",
@@ -107,6 +107,8 @@ def _get_wigos_station_data() -> pd.DataFrame:
     )
     response.raise_for_status()
     # TODO: Consider looking whether there is a way to filter stations by whether or not they include air pressure data.
+    # TODO: How to handle potential error? This should only occur if the API is down or the request times out, which
+    # should be rare
 
     # Get the relevant data from the response
     df = pd.json_normalize(response.json()["features"])
