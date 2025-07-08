@@ -9,18 +9,18 @@ select = ["ALL"]
 ignore = [
     # Unwanted
     "FAST002", # FastAPI specific
-    "DTZ005", # datetime timezone aware
-    "FBT",    # Boolean function arguments
-    "ANN003", # Missing type annotation for **{name} (e.g. **kwargs)
-    "ANN204", # Missing return type annotation for special (dunder) method
-    "PT011",  # pytest.raises without error messages
-    "TD",     # TODO formatting
-    "FIX",    # Resolve FIXME, TODO, XXX
-    "EXE002", # Executable but no shebang
-    "COM812", # Recommended to ignore by Ruff itself
-    "UP038",  # Use X | Y instead of (X, Y) in isinstance()
-    "B905",   # zip-without-explicit-strict
-    "UP017",  # datetime.UTC (updated in newer python versions, but doesn't work in older versions)
+    "DTZ005",  # datetime timezone aware
+    "FBT",     # Boolean function arguments
+    "ANN003",  # Missing type annotation for **{name} (e.g. **kwargs)
+    "ANN204",  # Missing return type annotation for special (dunder) method
+    "PT011",   # pytest.raises without error messages
+    "TD",      # TODO formatting
+    "FIX",     # Resolve FIXME, TODO, XXX
+    "EXE002",  # Executable but no shebang
+    "COM812",  # Recommended to ignore by Ruff itself
+    "UP038",   # Use X | Y instead of (X, Y) in isinstance()
+    "B905",    # zip-without-explicit-strict
+    "UP017",   # datetime.UTC (updated in newer python versions, but doesn't work in older versions)
     # Unneeded docstrings
     "D100",   # Missing module docstring
     "D104",   # Missing public package docstring
@@ -50,4 +50,5 @@ extend-safe-fixes = [
 ]
 
 [lint.per-file-ignores]
-"src/test_local.py" = ["T201"] # prints
+"test_local.py*" = ["T201", "ANN201", "D103", "S101", "PLR2004"]
+"run_manual.py" = ["T201", "ANN201", "D103", "S101", "PLR2004"]

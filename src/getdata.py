@@ -5,6 +5,7 @@ import pandas as pd
 import requests
 from dotenv import load_dotenv
 from geopy.distance import geodesic
+from geopy.exc import GeocoderServiceError
 from geopy.geocoders import Nominatim
 
 load_dotenv()  # Load API key from .env file
@@ -68,9 +69,12 @@ def get_location(input_city: str) -> tuple[str, float]:
 def _get_input_coordinates(city_name: str) -> tuple[float, float]:
     """Get the coordinates (lat, lon) of the given city name in the Netherlands."""
     geolocator = Nominatim(user_agent="knmi_city_lookup")
-    location = geolocator.geocode(city_name, featuretype="city")
-    if not location:
+    try:
         msg = f"Could not find coordinates for city: {city_name}"
+        location = geolocator.geocode(city_name, featuretype="city")
+    except GeocoderServiceError as e:
+        raise ValueError(msg) from e
+    if not location:
         raise ValueError(msg)
     location = geolocator.geocode(city_name, country_codes="nl", featuretype="city")
     if not location:
