@@ -58,8 +58,11 @@ def get_latest_pressure(station_id: str) -> tuple[float | None, str | None]:
     return df["pressure"].iloc[-1], df["time"].iloc[-1]
 
 
-def get_location(input_city: str) -> tuple[str, float]:
-    """Get the nearest KNMI weather station to the given city and the distance to it in km."""
+def get_location(input_city: str) -> tuple[str, float, str]:
+    """Find the nearest KNMI weather station to the given city.
+
+    Returns the wigos station id, distance to input city, and the name of the station.
+    """
     city_coords = _get_input_coordinates(input_city)
     min_distance = float("inf")
 
@@ -93,7 +96,10 @@ def _get_input_coordinates(city_name: str) -> tuple[float, float]:
 
 
 def _get_wigos_station_data() -> pd.DataFrame:
-    """Get the WIGOS ID and coordinates for all KNMI weather stations."""
+    """Get data for weather stations in the collection.
+
+    Returns a dataframe containing the wigos id ("station_id"), coordinates, and name ("station_name") for each station.
+    """
     response = requests.get(
         url=f"{BASE_URL}/locations",
         headers=HEADERS,
@@ -115,5 +121,5 @@ def _get_wigos_station_data() -> pd.DataFrame:
 
 
 def strf(dt: datetime.datetime) -> str:
-    """Format a datetime object to a string into format required by API."""
+    """Format a datetime object to a string into format required by the API."""
     return dt.strftime("%Y-%m-%dT%H:%M:%SZ")

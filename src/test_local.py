@@ -71,7 +71,7 @@ def test_no_data() -> None:
     """Test that the function raises an error when no data is available."""
     test_start = timeit.default_timer()
     no_data_cities = ["Kalenberg", "Nederland", "Meppel"]
-    # TODO: It's unclear whether these cities will never have data, but at time of writing, they do not.
+    # NOTE: It's unclear whether these cities will never have data, but at time of writing, they do not.
     for city in no_data_cities:
         min_distance, pressure = run_locally(city)
         assert min_distance < 100, f"{city} is not within 100 km of a weather station."

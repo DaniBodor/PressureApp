@@ -36,9 +36,9 @@ def pressure_endpoint(city_name: str = Query(..., description="City in The Nethe
             "target city": city_name,
             "nearest weather station": station_name,
             "nearest weather station id": station_id,
-            f"distance (km) from {city_name} to {station_name}": round(min_distance, 1),
+            "distance (km) to nearest weather station": round(min_distance, 1),
             "time of measurement (UTC)": retrieve_time,
-            f"pressure (hPa) at sea level for {station_name}": pressure,
+            "sea level air pressure (hPa) at station": pressure,
         }
     # TODO: Consider adding HTML response for errors instead of JSON.
     except ValueError as e:
