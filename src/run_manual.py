@@ -11,13 +11,14 @@ if __name__ == "__main__":
         station_id, min_distance, station_name = get_location(city_name)
         print(f"Nearest station to {city_name} is {station_name} ({station_id}), at {min_distance:.2f} km distance.")
         time = timeit.default_timer() - start
-        print(f"Process complete after {time:.2f} seconds.")
+        print(f"    Process complete after {time:.2f} seconds.")
 
-        pressure = get_latest_pressure(station_id, station_name)
-        print(f"Air pressure at {pressure[1]}: {pressure[0]} hPa")
+        pressure, time = get_latest_pressure(station_id)
+        print(f"Latest pressure measurement for {station_name} at {time}")
+        print(f"Air pressure at latest measurement: {pressure} hPa")
         time = timeit.default_timer() - start
-        print(f"Process complete after {time:.2f} seconds.")
+        print(f"    Process complete after {time:.2f} seconds.")
     except ValueError as e:
         print(e)
         time = timeit.default_timer() - start
-        print(f"Process complete after {time:.2f} seconds.")
+        print(f"    Process complete after {time:.2f} seconds.")

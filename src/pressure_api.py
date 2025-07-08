@@ -29,15 +29,18 @@ def pressure_endpoint(city_name: str = Query(..., description="City in The Nethe
     """Return the air pressure at sea level for the nearest KNMI weather station to the given city."""
     try:
         station_id, min_distance, station_name = get_location(city_name)
-        pressure, retrieve_time = get_latest_pressure(station_id, station_name)
+        pressure, retrieve_time = get_latest_pressure(station_id)
+        pressure = float(pressure) if pressure else None
+        retrieve_time = retrieve_time.replace("T", " ").replace(":00Z", "") if retrieve_time else None
         return {
             "target city": city_name,
             "nearest weather station": station_name,
             "nearest weather station id": station_id,
             f"distance (km) from {city_name} to {station_name}": round(min_distance, 1),
-            "data retrieved for timepoint (UTC)": retrieve_time.replace("T", " ").replace(":00Z", ""),
-            f"pressure (hPa) at sea level for {station_name}": float(pressure),
+            "time of measurement (UTC)": retrieve_time,
+            f"pressure (hPa) at sea level for {station_name}": pressure,
         }
+    # TODO: Consider adding HTML response for errors instead of JSON.
     except ValueError as e:
         return {"No data retrieved": str(e)}
     except Exception as e:  # noqa: BLE001

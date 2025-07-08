@@ -20,10 +20,11 @@ TIMEOUT = 20  # seconds for before a request times out
 geolocator = Nominatim(user_agent="knmi_city_lookup", timeout=TIMEOUT)
 
 
-def get_latest_pressure(station_id: str, station_name: str) -> tuple[float, str]:
+def get_latest_pressure(station_id: str) -> tuple[float | None, str | None]:
     """Get the air pressure at sea level for the given KNMI weather station (wigos) id.
 
-    Also return the time of the data retrieval as stated in the dataset.
+    Returns a tuple containing the latest pressure value and the time of the data retrieval as stated in the dataset.
+    Returns None for both values if no data is available for the station.
     """
     utc = datetime.timezone.utc
     now = datetime.datetime.now(utc)
@@ -44,9 +45,8 @@ def get_latest_pressure(station_id: str, station_name: str) -> tuple[float, str]
     )
     try:
         response.raise_for_status()
-    except requests.HTTPError as e:
-        msg = f"No data found for station: {station_id} ({station_name})."
-        raise ValueError(msg) from e
+    except requests.HTTPError:
+        return None, None
 
     # Extract relevant data from response
     coverage = response.json()["coverages"][0]
