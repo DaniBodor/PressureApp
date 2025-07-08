@@ -20,14 +20,14 @@ TIMEOUT = 20  # seconds for before a request times out
 geolocator = Nominatim(user_agent="knmi_city_lookup", timeout=TIMEOUT)
 
 
-def get_latest_pressure(station_id: str) -> tuple[float, str]:
+def get_latest_pressure(station_id: str, station_name: str) -> tuple[float, str]:
     """Get the air pressure at sea level for the given KNMI weather station (wigos) id.
 
     Also return the time of the data retrieval as stated in the dataset.
     """
     utc = datetime.timezone.utc
     now = datetime.datetime.now(utc)
-    # Data is acquired in 10 minute intervals and uploaded with a delay of a few minutes.
+    # Data is acquired in 10 minute intervals and uploaded with a (non-constant) delay of a few minutes.
     # By fetching data from the last 20 minutes, we ensure we get the latest available data.
     older = now - datetime.timedelta(minutes=20)
 
@@ -42,7 +42,11 @@ def get_latest_pressure(station_id: str) -> tuple[float, str]:
         headers=HEADERS,
         timeout=TIMEOUT,
     )
-    response.raise_for_status()
+    try:
+        response.raise_for_status()
+    except requests.HTTPError as e:
+        msg = f"No data found for station: {station_id} ({station_name})."
+        raise ValueError(msg) from e
 
     # Extract relevant data from response
     coverage = response.json()["coverages"][0]
@@ -58,14 +62,14 @@ def get_location(input_city: str) -> tuple[str, float]:
     """Get the nearest KNMI weather station to the given city and the distance to it in km."""
     city_coords = _get_input_coordinates(input_city)
     min_distance = float("inf")
-    nearest_station_id = None
 
-    for station_id, station_coords in _get_wigos_station_data().items():
-        distance = geodesic(city_coords, station_coords).kilometers
+    for _, station in _get_wigos_station_data().iterrows():
+        distance = geodesic(city_coords, station["coordinates"]).kilometers
         if distance < min_distance:
             min_distance = distance
-            nearest_station_id = station_id
-    return nearest_station_id, min_distance
+            nearest_station_id = station["station_id"]
+            station_name = station["station_name"]
+    return nearest_station_id, min_distance, station_name
 
 
 def _get_input_coordinates(city_name: str) -> tuple[float, float]:
@@ -88,7 +92,7 @@ def _get_input_coordinates(city_name: str) -> tuple[float, float]:
     return location.longitude, location.latitude
 
 
-def _get_wigos_station_data() -> dict[str, tuple[float, float]]:
+def _get_wigos_station_data() -> pd.DataFrame:
     """Get the WIGOS ID and coordinates for all KNMI weather stations."""
     response = requests.get(
         url=f"{BASE_URL}/locations",
@@ -96,12 +100,18 @@ def _get_wigos_station_data() -> dict[str, tuple[float, float]]:
         timeout=TIMEOUT,
     )
     response.raise_for_status()
-    data = response.json()
+    # TODO: Consider looking whether there is a way to filter stations by whether or not they include air pressure data.
 
-    # Flatten the nested JSON structure
-    df = pd.json_normalize(data["features"])
-    # Create dict from id and coordinates columns
-    return dict(zip(df["id"], df["geometry.coordinates"]))
+    # Get the relevant data from the response
+    df = pd.json_normalize(response.json()["features"])
+    df = df.rename(
+        columns={
+            "id": "station_id",
+            "geometry.coordinates": "coordinates",
+            "properties.name": "station_name",
+        }
+    )
+    return df[["station_id", "coordinates", "station_name"]]
 
 
 def strf(dt: datetime.datetime) -> str:

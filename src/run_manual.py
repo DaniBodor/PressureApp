@@ -8,20 +8,16 @@ if __name__ == "__main__":
     start = timeit.default_timer()
 
     try:
-        nearest_station, min_distance = get_location(city_name)
-        print(f"Nearest station to {city_name} is at {min_distance:.2f} km distance.")
+        station_id, min_distance, station_name = get_location(city_name)
+        print(f"Nearest station to {city_name} is {station_name} ({station_id}), at {min_distance:.2f} km distance.")
         time = timeit.default_timer() - start
         print(f"Process complete after {time:.2f} seconds.")
 
-        pressure = get_latest_pressure(nearest_station)
+        pressure = get_latest_pressure(station_id, station_name)
         print(f"Air pressure at {pressure[1]}: {pressure[0]} hPa")
         time = timeit.default_timer() - start
         print(f"Process complete after {time:.2f} seconds.")
     except ValueError as e:
         print(e)
-        time = timeit.default_timer() - start
-        print(f"Process complete after {time:.2f} seconds.")
-    except Exception as e:  # noqa: BLE001
-        print(f"An error occurred: {e}")
         time = timeit.default_timer() - start
         print(f"Process complete after {time:.2f} seconds.")

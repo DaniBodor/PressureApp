@@ -7,8 +7,8 @@ from src.getdata import get_latest_pressure, get_location
 
 def run_locally(city_name: str) -> tuple[float, float, str]:
     """Run the get_location and get_latest_pressure functions locally."""
-    nearest_station, min_distance = get_location(city_name)
-    pressure, _timepoint = get_latest_pressure(nearest_station)
+    station_id, min_distance, station_name = get_location(city_name)
+    pressure, _timepoint = get_latest_pressure(station_id, station_name)
     return min_distance, pressure
 
 
@@ -62,6 +62,18 @@ def test_foreign() -> None:
     for city in foreign_cities:
         print(f"Testing city: {city}", end="")
         with pytest.raises(ValueError, match="not in the Netherlands"):
+            _, _ = run_locally(city)
+        elapsed = timeit.default_timer() - test_start
+        print(f" - Complete after {elapsed:.2f} seconds.")
+
+
+def test_no_data() -> None:
+    """Test that the function raises an error when no data is available."""
+    test_start = timeit.default_timer()
+    no_data_cities = ["Kalenberg", "Nederland", "Meppel"]
+    # TODO: It's unclear whether these cities will never have data, but at time of writing, they do not.
+    for city in no_data_cities:
+        with pytest.raises(ValueError, match="No data found for station"):
             _, _ = run_locally(city)
         elapsed = timeit.default_timer() - test_start
         print(f" - Complete after {elapsed:.2f} seconds.")
