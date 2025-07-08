@@ -1,6 +1,7 @@
 import timeit
 
 import pytest
+from fastapi import HTTPException
 
 from src.getdata import get_latest_pressure, get_location
 
@@ -46,7 +47,7 @@ def test_invalid_inputs() -> None:
     ]
     for city in non_existing_cities:
         print(f"Testing city: {city}", end="")
-        with pytest.raises(ValueError, match="Could not find coordinates for city"):
+        with pytest.raises(HTTPException, match=f"City of '{city}' not found"):
             _, _ = run_locally(city)
         elapsed = timeit.default_timer() - test_start
         print(f" - Complete after {elapsed:.2f} seconds.")
@@ -61,7 +62,7 @@ def test_foreign() -> None:
     ]
     for city in foreign_cities:
         print(f"Testing city: {city}", end="")
-        with pytest.raises(ValueError, match="not in the Netherlands"):
+        with pytest.raises(HTTPException, match="not in The Netherlands"):
             _, _ = run_locally(city)
         elapsed = timeit.default_timer() - test_start
         print(f" - Complete after {elapsed:.2f} seconds.")

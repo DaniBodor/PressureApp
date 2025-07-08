@@ -4,6 +4,7 @@ import os
 import pandas as pd
 import requests
 from dotenv import load_dotenv
+from fastapi import HTTPException
 from geopy.distance import geodesic
 from geopy.exc import GeocoderServiceError
 from geopy.geocoders import Nominatim
@@ -82,16 +83,14 @@ def _get_input_coordinates(city_name: str) -> tuple[float, float]:
     the collection.
     """
     try:
-        msg = f"Could not find coordinates for city: {city_name}"
         location = geolocator.geocode(city_name, featuretype="city")
     except GeocoderServiceError as e:
-        raise ValueError(msg) from e
+        raise HTTPException(status_code=404, detail=f"City of '{city_name}' not found") from e
     if not location:
-        raise ValueError(msg)
+        raise HTTPException(status_code=404, detail=f"City of '{city_name}' not found")
     location = geolocator.geocode(city_name, country_codes="nl", featuretype="city")
     if not location:
-        msg = f"The city of {city_name} is not in the Netherlands."
-        raise ValueError(msg)
+        raise HTTPException(status_code=422, detail=f"City of '{city_name}' is not in The Netherlands")
     return location.longitude, location.latitude
 
 
@@ -107,8 +106,6 @@ def _get_wigos_station_data() -> pd.DataFrame:
     )
     response.raise_for_status()
     # TODO: Consider looking whether there is a way to filter stations by whether or not they include air pressure data.
-    # TODO: How to handle potential error? This should only occur if the API is down or the request times out, which
-    # should be rare
 
     # Get the relevant data from the response
     df = pd.json_normalize(response.json()["features"])

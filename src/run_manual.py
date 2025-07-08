@@ -1,5 +1,7 @@
 import timeit
 
+from fastapi import HTTPException
+
 from getdata import get_latest_pressure, get_location
 
 if __name__ == "__main__":
@@ -18,7 +20,7 @@ if __name__ == "__main__":
         print(f"Air pressure at latest measurement: {pressure} hPa")
         time = timeit.default_timer() - start
         print(f"    Process complete after {time:.2f} seconds.")
-    except ValueError as e:
+    except HTTPException as e:
         print(e)
         time = timeit.default_timer() - start
         print(f"    Process complete after {time:.2f} seconds.")
