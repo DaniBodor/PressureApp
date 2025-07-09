@@ -38,25 +38,25 @@ def get_latest_pressure(station_id: str) -> tuple[float | None, str | None]:
         "parameter-name": "pp",
     }
 
-    response = requests.get(
+    weather_data = requests.get(
         url=f"{BASE_URL}/locations/{station_id}",
         params=params,
         headers=HEADERS,
         timeout=TIMEOUT,
     )
     try:
-        response.raise_for_status()
+        weather_data.raise_for_status()
     except requests.HTTPError:
         return None, None
 
     # Extract relevant data from response
-    coverage = response.json()["coverages"][0]
+    coverage = weather_data.json()["coverages"][0]
     times = coverage["domain"]["axes"]["t"]["values"]
     values = coverage["ranges"]["pp"]["values"]
-    df = pd.DataFrame({"time": times, "pressure": values})
+    weather_df = pd.DataFrame({"time": times, "pressure": values})
 
     # return the last pressure value and its corresponding time
-    return df["pressure"].iloc[-1], df["time"].iloc[-1]
+    return weather_df["pressure"].iloc[-1], weather_df["time"].iloc[-1]
 
 
 def get_location(input_city: str) -> tuple[str, float, str]:
@@ -99,24 +99,24 @@ def _get_wigos_station_data() -> pd.DataFrame:
 
     Returns a dataframe containing the wigos id ("station_id"), coordinates, and name ("station_name") for each station.
     """
-    response = requests.get(
+    stations = requests.get(
         url=f"{BASE_URL}/locations",
         headers=HEADERS,
         timeout=TIMEOUT,
     )
-    response.raise_for_status()
+    stations.raise_for_status()
     # TODO: Consider looking whether there is a way to filter stations by whether or not they include air pressure data.
 
     # Get the relevant data from the response
-    df = pd.json_normalize(response.json()["features"])
-    df = df.rename(
+    stations_df = pd.json_normalize(stations.json()["features"])
+    stations_df = stations_df.rename(
         columns={
             "id": "station_id",
             "geometry.coordinates": "coordinates",
             "properties.name": "station_name",
         }
     )
-    return df[["station_id", "coordinates", "station_name"]]
+    return stations_df[["station_id", "coordinates", "station_name"]]
 
 
 def strf(dt: datetime.datetime) -> str:
