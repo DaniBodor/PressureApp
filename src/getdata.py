@@ -31,7 +31,7 @@ def get_latest_pressure(station_id: str) -> tuple[float | None, str | None]:
     now = datetime.datetime.now(utc)
     # Data is acquired in 10 minute intervals and uploaded with a (non-constant) delay of a few minutes.
     # By fetching data from the last 20 minutes, we ensure we get the latest available data.
-    older = now - datetime.timedelta(hours=48)
+    older = now - datetime.timedelta(mins=20)
 
     params = {
         "datetime": f"{strf(older)}/{strf(now)}",
