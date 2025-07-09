@@ -82,9 +82,13 @@ def _get_input_coordinates(city_name: str) -> tuple[float, float]:
     The coordinates are returned flipped from typical convention of (lat, lon) to match how the data is retrieved from
     the collection.
     """
+    # TODO: There is some inconsistency below in what is considered a city
+    # Zuilen, Noord Holland, Zuid Holland (but not other provinces), Texel, Saba are all recognized as valid inputs
+    # Scheveningen, Oog in al, other provinces are not
     try:
         location = geolocator.geocode(city_name, featuretype="city")
     except GeocoderServiceError as e:
+        # TODO This seems to catch connection errors as well.
         raise HTTPException(status_code=404, detail=f"City of '{city_name}' not found") from e
     if not location:
         raise HTTPException(status_code=404, detail=f"City of '{city_name}' not found")
@@ -105,7 +109,9 @@ def _get_wigos_station_data() -> pd.DataFrame:
         timeout=TIMEOUT,
     )
     stations.raise_for_status()
-    # TODO: Consider looking whether there is a way to filter stations by whether or not they include air pressure data.
+    # TODO: Some weather stations seem to not have any data (e.g. Wijk aan Zee/257; Assendelft/233; Heino/278)
+    # The metadata doesn't give an immediate reason for this.
+    # Consider looking whether there is a way to filter stations by whether or not they include air pressure data.
 
     # Get the relevant data from the response
     stations_df = pd.json_normalize(stations.json()["features"])
