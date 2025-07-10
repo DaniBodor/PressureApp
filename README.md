@@ -28,7 +28,7 @@ uvicorn src.pressure_api:app --reload
 
 ### Test in terminal
 
-There are two options to test the data retrieval from a terminal rather than from the API. In either case, first follow steps 0 and 1 from above
+There are two options to test the data retrieval from a terminal rather than from the browser. In either case, first follow steps 0 and 1 from above
 
 - For a given manual input and printed output, run `python src/run_manual.py`
 - To test a pre-determined range of valid and non-valid inputs, run `pytest src/test_local.py`
